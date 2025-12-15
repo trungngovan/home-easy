@@ -13,13 +13,9 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 import os
 from datetime import timedelta
 from pathlib import Path
-from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
-# Load environment variables from .env file
-load_dotenv(BASE_DIR / '.env')
 
 
 # Quick-start development settings - unsuitable for production
@@ -31,7 +27,7 @@ SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'dev-secret-change-me')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = os.getenv('DJANGO_ALLOWED_HOSTS', 'localhost,127.0.0.1,192.168.0.193').split(',')
+ALLOWED_HOSTS = os.getenv('DJANGO_ALLOWED_HOSTS', 'localhost,127.0.0.1,192.168.0.193,.railway.app').split(',')
 
 
 # Application definition
@@ -65,6 +61,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # Serve static files in production
     'django.contrib.sessions.middleware.SessionMiddleware',
     'corsheaders.middleware.CorsMiddleware',  # CORS - must be before CommonMiddleware
     'django.middleware.common.CommonMiddleware',
@@ -72,7 +69,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'backend.middleware.PerformanceMiddleware',  # Performance monitoring
 ]
 
 ROOT_URLCONF = 'backend.urls'
@@ -140,8 +136,9 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # Media files (user uploads)
 MEDIA_URL = '/media/'
@@ -171,7 +168,7 @@ REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 20,
     'PAGE_SIZE_QUERY_PARAM': 'page_size',
-    'MAX_PAGE_SIZE': 100,  # Reduced from 200 to improve performance
+    'MAX_PAGE_SIZE': 200,
 }
 
 SPECTACULAR_SETTINGS = {
@@ -188,19 +185,11 @@ SIMPLE_JWT = {
 
 # Google OAuth client IDs (used for token verification)
 GOOGLE_CLIENT_ID_WEB = os.getenv('GOOGLE_CLIENT_ID_WEB', '')
-GOOGLE_CLIENT_ID_ANDROID = os.getenv('GOOGLE_CLIENT_ID_ANDROID', '')
-GOOGLE_CLIENT_ID_IOS = os.getenv('GOOGLE_CLIENT_ID_IOS', '')
 
 # CORS Configuration
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",  # Next.js dev server
     "http://127.0.0.1:3000",
-    "http://localhost:8081",  # Expo web / React Native Metro
-    "http://127.0.0.1:8081",
-    "http://192.168.0.193:3000",  # LAN IP - Next.js
-    "http://192.168.0.193:8081",  # LAN IP - React Native Metro
-    "http://192.168.0.193:19000",  # LAN IP - Expo dev server
-    "http://192.168.0.193:19006",  # LAN IP - Expo web
 ]
 
 # Allow credentials (cookies, authorization headers)
@@ -222,42 +211,3 @@ CORS_ALLOW_HEADERS = [
 # For development only - allow all origins (uncomment if needed)
 # Enable this for easier mobile development on local network
 CORS_ALLOW_ALL_ORIGINS = True
-
-# Logging configuration
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'formatters': {
-        'verbose': {
-            'format': '{levelname} {asctime} {module} {message}',
-            'style': '{',
-        },
-    },
-    'handlers': {
-        'console': {
-            'class': 'logging.StreamHandler',
-            'formatter': 'verbose',
-        },
-    },
-    'root': {
-        'handlers': ['console'],
-        'level': 'INFO',
-    },
-    'loggers': {
-        'django': {
-            'handlers': ['console'],
-            'level': 'INFO',
-            'propagate': False,
-        },
-        'django.db.backends': {
-            'handlers': ['console'],
-            'level': 'DEBUG' if DEBUG else 'INFO',
-            'propagate': False,
-        },
-        'backend': {
-            'handlers': ['console'],
-            'level': 'DEBUG' if DEBUG else 'INFO',
-            'propagate': False,
-        },
-    },
-}

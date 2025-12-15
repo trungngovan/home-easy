@@ -218,6 +218,14 @@ cd frontend
 npm run lint
 ```
 
+### Production smoke checklist (post-deploy)
+- Open `https://<vercel-domain>/` and ensure SSR pages render.
+- Trigger an authenticated API call (e.g., login) and confirm `200` from Railway backend.
+- Confirm CORS/CSRF: no blocked requests from Vercel domain.
+- Verify DB connection: `python manage.py migrate` ran against Supabase; sample query via `/api/auth/me/`.
+- If using Google login, verify OAuth redirect/ID token validation in prod.
+- If serving static via app, ensure `collectstatic` assets load (or use external storage).
+
 ## 🛠️ Development Workflow
 
 ### Using Makefile
@@ -318,15 +326,18 @@ The project uses SQLite for development, which makes it easy to get started. The
 ## 📝 Environment Variables
 
 ### Backend (`.env`)
-- `DJANGO_SECRET_KEY` - Django secret key (required)
+- `DATABASE_URL` - Supabase Postgres URL (append `?sslmode=require` in prod)
+- `DJANGO_SECRET_KEY` - Django secret key
+- `DJANGO_DEBUG` - `true|false`
 - `DJANGO_ALLOWED_HOSTS` - Comma-separated list of allowed hosts
-- `GOOGLE_CLIENT_ID_WEB` - Google OAuth client ID for web
-- `GOOGLE_CLIENT_ID_ANDROID` - Google OAuth client ID for Android
-- `GOOGLE_CLIENT_ID_IOS` - Google OAuth client ID for iOS
+- `DJANGO_CSRF_TRUSTED_ORIGINS` - Comma-separated trusted origins (include Vercel/Railway domains)
+- `CORS_ALLOWED_ORIGINS` - Comma-separated allowed origins (include Vercel domain)
+- `GOOGLE_CLIENT_ID_WEB` / `GOOGLE_CLIENT_ID_ANDROID` / `GOOGLE_CLIENT_ID_IOS`
 
 ### Frontend (`.env.local`)
-- `NEXT_PUBLIC_API_BASE_URL` - Backend API base URL (defaults to `http://localhost:8000/api`)
+- `NEXT_PUBLIC_API_BASE_URL` - API base (`/api` when using Vercel rewrite, or full URL)
 - `NEXT_PUBLIC_GOOGLE_CLIENT_ID` - Google OAuth client ID for web
+- `API_BASE_URL` (private) - Backend base URL for Vercel rewrite target (Railway)
 
 ## 🚧 Development Status
 

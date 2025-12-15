@@ -14,6 +14,21 @@ python manage.py createsuperuser  # if needed
 python manage.py runserver 0.0.0.0:8000
 ```
 
+## Prod env (Railway + Supabase Postgres)
+- `DATABASE_URL` (Supabase: append `?sslmode=require`)
+- `DJANGO_SECRET_KEY`
+- `DJANGO_DEBUG=false`
+- `DJANGO_ALLOWED_HOSTS` (comma-separated, include Railway domain/custom domain)
+- `DJANGO_CSRF_TRUSTED_ORIGINS` (comma-separated, e.g. `https://yourapp.vercel.app,https://<railway-domain>`)
+- `CORS_ALLOWED_ORIGINS` (comma-separated, include Vercel domain)
+- Optional: `GOOGLE_CLIENT_ID_*` (same as dev) for auth
+
+Deploy steps (once env set):
+```bash
+python manage.py migrate
+python manage.py collectstatic --noinput  # if serving static from app/whitenoise
+```
+
 ### OAuth env
 Set Google client IDs (at least one) so `/auth/google/` verification works:
 ```

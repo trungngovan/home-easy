@@ -9,4 +9,8 @@ reportlab==4.2.5
 google-auth==2.38.0
 requests==2.32.3
 python-dotenv==1.0.0
+dj-database-url==2.2.0
+psycopg[binary]==3.3.2
+gunicorn==22.0.0
+whitenoise==6.7.0
 
