@@ -1,0 +1,10 @@
+Django==6.0
+djangorestframework==3.16.1
+drf-spectacular==0.29.0
+drf-spectacular-sidecar==2025.12.1
+djangorestframework-simplejwt==5.5.1
+Django==6.0
+djangorestframework==3.16.1
+drf-spectacular==0.29.0
+drf-spectacular-sidecar==2025.12.1
+
